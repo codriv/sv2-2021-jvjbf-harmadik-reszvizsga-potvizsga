@@ -47,6 +47,8 @@ public class ContentService {
                 if (user.isPremiumMember()) {
                     content.click(user);
                 }
+            } else {
+                content.click(user);
             }
         }
     }
