@@ -30,15 +30,15 @@ public class ContentService {
     }
 
     public void logIn(String username, String password) {
-        if (!allUsers.stream().anyMatch(user -> username.equals(user.getUserName()))) {
+        if (allUsers.stream().noneMatch(user -> username.equals(user.getUserName()))) {
             throw new IllegalArgumentException("Username is wrong!");
-        } else if (!password.equals(allUsers.stream()
+        } else if ((username + password).hashCode() != (allUsers.stream()
                         .filter(user -> username.equals(user.getUserName()))
                         .findFirst()
                         .get().getPassword())) {
             throw new IllegalArgumentException("Password is Invalid!");
         }
-        allUsers.stream().filter(user -> username.equals(user.getUserName())).findFirst().get().isLogIn();
+        allUsers.stream().filter(user -> username.equals(user.getUserName())).findFirst().get().setLogIn(true);
     }
 
     public void clickOnContent(User user, Content content) {
@@ -46,10 +46,14 @@ public class ContentService {
             if (content.isPremiumContent()) {
                 if (user.isPremiumMember()) {
                     content.click(user);
+                } else {
+                    throw new IllegalStateException("Upgrade for Premium to watch this content!");
                 }
             } else {
                 content.click(user);
             }
+        } else {
+            throw new IllegalStateException("Log in to watch this content!");
         }
     }
 }

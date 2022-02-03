@@ -1,5 +1,7 @@
 package contentsite;
 
+import java.util.Objects;
+
 public class User {
 
     private String userName;
@@ -34,5 +36,18 @@ public class User {
 
     public void upgradeForPremium() {
         isPremiumMember = true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return userName.equals(user.userName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userName);
     }
 }
