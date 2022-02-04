@@ -26,7 +26,6 @@ public class ContentService {
         if (!contentService.add(content)) {
             throw new IllegalArgumentException("Content name is already taken: " + content.getTitle());
         }
-
     }
 
     public void logIn(String username, String password) {
@@ -34,26 +33,30 @@ public class ContentService {
             throw new IllegalArgumentException("Username is wrong!");
         } else if ((username + password).hashCode() != (allUsers.stream()
                         .filter(user -> username.equals(user.getUserName()))
-                        .findFirst()
-                        .get().getPassword())) {
+                        .findFirst().get().getPassword())) {
             throw new IllegalArgumentException("Password is Invalid!");
         }
-        allUsers.stream().filter(user -> username.equals(user.getUserName())).findFirst().get().setLogIn(true);
+        allUsers.stream().filter(user -> username.equals(user.getUserName()))
+                .findFirst().get().setLogIn(true);
     }
 
     public void clickOnContent(User user, Content content) {
         if (user.isLogIn()) {
-            if (content.isPremiumContent()) {
-                if (user.isPremiumMember()) {
-                    content.click(user);
-                } else {
-                    throw new IllegalStateException("Upgrade for Premium to watch this content!");
-                }
-            } else {
-                content.click(user);
-            }
+            clickLoggedIn(user, content);
         } else {
             throw new IllegalStateException("Log in to watch this content!");
+        }
+    }
+
+    private void clickLoggedIn(User user, Content content) {
+        if (content.isPremiumContent()) {
+            if (user.isPremiumMember()) {
+                content.click(user);
+            } else {
+                throw new IllegalStateException("Upgrade for Premium to watch this content!");
+            }
+        } else {
+            content.click(user);
         }
     }
 }

@@ -3,6 +3,7 @@ package examinformation;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -49,17 +50,27 @@ public class ExamService {
 
     public List<String> findPeopleFailed() {
         return results.keySet().stream()
-                .filter(name -> results.get(name).getTheory() < (int)(theoryMax * 0.51) || results.get(name).getPractice() < (int)(practiceMax * 0.51)).toList();
+                .filter(this::isExamUnsuccessful).toList();
     }
 
     public String findBestPerson() {
         return results.keySet().stream()
-                .filter(name -> results.get(name).getTheory() > (int)(theoryMax * 0.5) && results.get(name).getPractice() > (int)(practiceMax * 0.5))
-                .max((o1, o2) -> getfullResult(o1) - getfullResult(o2) == 0 ? o1.compareTo(o2) : getfullResult(o1) - getfullResult(o2))
+                .filter(this::isExamSuccessful)
+                .max(Comparator.comparingInt(this::getFullResult).thenComparing(o -> o))
                 .orElseThrow(() -> new IllegalStateException("List of results maybe empty!"));
     }
 
-    private int getfullResult(String name) {
+    private int getFullResult(String name) {
         return results.get(name).getTheory() + results.get(name).getPractice();
+    }
+
+    private boolean isExamSuccessful(String name) {
+        return results.get(name).getTheory() >= (int)(theoryMax * 0.51)
+                && results.get(name).getPractice() >= (int)(practiceMax * 0.51);
+    }
+
+    private boolean isExamUnsuccessful(String name) {
+        return results.get(name).getTheory() < (int)(theoryMax * 0.51)
+                || results.get(name).getPractice() < (int)(practiceMax * 0.51);
     }
 }
